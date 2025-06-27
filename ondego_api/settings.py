@@ -68,10 +68,16 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOWED_ORIGINS = [
     os.environ.get('CLIENT_ORIGIN'),
-    "http://localhost:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Session-based auth settings for cross-origin requests
+if 'DEV' not in os.environ:
+    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'None'
+    CSRF_COOKIE_SECURE = True
 
 # Application definition
 
@@ -112,6 +118,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Required for django-allauth 65.x+
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -121,7 +129,7 @@ ROOT_URLCONF = 'ondego_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'staticfiles', 'build')],
+        'DIRS': [],  # No longer serving React build
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -190,7 +198,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'staticfiles' / 'build' / 'static']
+# No longer serving React build files - frontend is now separate
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
